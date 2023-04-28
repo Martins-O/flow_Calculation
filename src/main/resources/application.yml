@@ -1,0 +1,27 @@
+spring:
+  datasource:
+#    driver-class-name: org.mysql.sql.Driver
+    url: jdbc:mysql://localhost:3306/flowCalculator
+    username: root
+    password: 08146587069Gg@
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+          dialect: org.hibernate.dialect.MYSQL5InnoDBDialect
+
+
+
+server:
+  port: 7092
+  servlet:
+    context:
+      path: flowCalculator
+
+
+
+
