@@ -10,6 +10,7 @@ import com.example.flowcalculator.exceptiom.UnauthorizedRequestException;
 import com.example.flowcalculator.exceptiom.UsernameAlreadyExistsException;
 import com.example.flowcalculator.security.AuthenticationUser;
 import com.example.flowcalculator.security.JwtGenerator;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements AppUserService{
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .username(request.getUsername())
-                .password(request.getPassword())
+                .password(encoder.encode(request.getPassword()))
                 .age(getAge(request.getBirthDate()))
                 .createdAt(LocalDate.now())
                 .build();
@@ -78,7 +78,8 @@ public class AppUserServiceImpl implements AppUserService{
     }
 
     @Override
-    public TokenResponseDto login(String username, String password) {
+    public TokenResponseDto login(@NotBlank(message = "Username is required") String username,
+                                  @NotBlank(message = "password is required") String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
@@ -87,6 +88,10 @@ public class AppUserServiceImpl implements AppUserService{
         }catch (Exception e) {
             throw new InvalidLoginDetailsException("invalid login details");
         }
+    }
+    @Override
+    public AppDto logout() {
+        return loginResponse();
     }
 
     @Override
@@ -97,13 +102,11 @@ public class AppUserServiceImpl implements AppUserService{
             if (authUser == null) {
                 throw new UnauthorizedRequestException("");
             }
-            return repository.findUserByUsername(authUser.getUsername())
-                    .orElseThrow(UnauthorizedRequestException::new);
+            return (AppUser) repository.findAppUserByUsername(authUser.getUsername()).orElseThrow();
         } catch (Exception e) {
-            throw new UnauthorizedRequestException();
+            throw new UnauthorizedRequestException("Unauthorized request");
         }
     }
-
     @Override
     public List<AppUser> getAllUsers() {
         return repository.findAll();

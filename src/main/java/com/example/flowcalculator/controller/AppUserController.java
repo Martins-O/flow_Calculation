@@ -1,9 +1,11 @@
 package com.example.flowcalculator.controller;
 
-import com.example.flowcalculator.data.dto.AppDto;
 import com.example.flowcalculator.data.dto.CreateRequest;
+import com.example.flowcalculator.data.dto.TokenResponseDto;
 import com.example.flowcalculator.data.model.AppUser;
 import com.example.flowcalculator.service.AppUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +21,18 @@ public class AppUserController {
 
     @PostMapping(name = "Registration",
             path = "register")
+    @Operation(summary = "Create new account")
     public ResponseEntity<?> create(@RequestBody CreateRequest request){
-        AppDto register = service.creatUser(request);
+        TokenResponseDto register = service.creatUser(request);
         return ResponseEntity.ok().body(register);
     }
 
     @PostMapping(name = "Login",
     path = "Login")
-    public ResponseEntity<?> login(@RequestParam String username,
-                                   @RequestParam String password) {
-        AppDto login = service.login(username, password);
+    @Operation(summary = "Login")
+    public ResponseEntity<?> login(@RequestParam @Valid String username,
+                                   @RequestParam @Valid String password) {
+        TokenResponseDto login = service.login(username, password);
         return ResponseEntity.ok().body(login);
     }
 

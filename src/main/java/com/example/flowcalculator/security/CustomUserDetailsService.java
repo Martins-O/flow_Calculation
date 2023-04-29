@@ -17,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         AppUser user =
-                (AppUser) repository.findrByUsername(username)
+                (AppUser) repository.findAppUserByUsername(username)
                         .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
         return AuthenticationUser.builder()
                 .appUser(user)
